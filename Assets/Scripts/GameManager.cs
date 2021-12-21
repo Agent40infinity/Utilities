@@ -81,6 +81,6 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        loadingScreen.SetActive(true);
+        loadingScreen.SetActive(false);
     }
 }

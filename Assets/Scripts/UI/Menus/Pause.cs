@@ -121,7 +121,6 @@ public class Pause : MonoBehaviour
 
         fade.FadeIn();
         menu.music.Play();
-        gameManager.LeaveGame();
     }
 
     public void OptionsCall(bool toggle)

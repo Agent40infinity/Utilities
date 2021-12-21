@@ -12,7 +12,6 @@ public class UIEvents : MonoBehaviour
     public void Start()
     {
         Visibility(true);
-        Selector(EventSystem.current.firstSelectedGameObject);
     }
 
     public void Update()

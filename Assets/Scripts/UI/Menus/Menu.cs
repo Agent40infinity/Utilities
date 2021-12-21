@@ -8,17 +8,9 @@ using UnityEngine.UI;
 public class Menu : MonoBehaviour
 {
     #region Variables
-    //General: 
-    public GameObject main, mainBackground; //Allows for reference to GameObjects Meny and Options
-    public AudioMixer masterMixer;                   //public bool toggle = false; //Toggle for switching between settings and main
-                                                     //public int option = 0;      //Changes between the 4 main screens in options.
+    //General:                                                   
     public UIEvents selectors;
     public FadeController fade;
-
-    public bool quitTimer = false; //Check whether or not the exit button has been pressed
-    public int qTimer = 0; //Timer for transition - exit
-    public bool startTimer = false; //Checks whether or not the play button has been pressed
-    public int sTimer = 0; //Timer for transition - load game
 
     //Music:
     public AudioSource music;
@@ -34,8 +26,14 @@ public class Menu : MonoBehaviour
 
     public void Start() //Used to load resolutions and create list for the dropdown, collects both Width and Height seperately
     {
-        gameManager = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
+        GetReferences();
         StartCoroutine("LoadScreen");
+    }
+
+    public void GetReferences()
+    {
+        gameManager = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
+        fade = GameObject.FindWithTag("FadeController").GetComponent<FadeController>();
     }
 
     public void Update()
@@ -58,29 +56,24 @@ public class Menu : MonoBehaviour
         }
     }
 
-    public void StartGame() //Trigger for Play Button
+    public void CallStart() //Trigger for Play Button
     {
-        StartCoroutine("StartCall");
+        StartCoroutine(StartGame());
     }
 
-    IEnumerator StartCall()
+    IEnumerator StartGame()
     {
         music.Stop();
         fade.FadeOut();
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-        yield return new WaitForSeconds(2);
-        main.SetActive(false);
-        mainBackground.SetActive(false);
         selectors.Visibility(false);
-
+        yield return new WaitForSeconds(2);
+        gameManager.LoadGame();
         fade.FadeIn();
-        gameManager.StartGame();
     }
 
-    public void Quit() //Trigger for Exit Button
+    public void CallQuit() //Trigger for Exit Button
     {
-        StartCoroutine("QuitGame");
+        StartCoroutine(QuitGame());
     }
 
     IEnumerator QuitGame()
