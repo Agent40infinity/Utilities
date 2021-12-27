@@ -30,9 +30,3 @@ public class SystemConfig : MonoBehaviour
         Debug.Log("Loaded");
     }
 }
-
-public enum SaveState //Sets up save states to make switching easier
-{
-    Save,
-    Load
-}

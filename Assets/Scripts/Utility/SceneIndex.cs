@@ -7,5 +7,6 @@ public enum SceneIndex
     Menu_Main,
     Menu_Options,
     Menu_Pause,
+    Player,
     World,
 }

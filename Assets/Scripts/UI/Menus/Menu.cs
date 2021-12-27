@@ -8,7 +8,8 @@ using UnityEngine.UI;
 public class Menu : MonoBehaviour
 {
     #region Variables
-    //General:                                                   
+    //General:             
+    public Dictionary<string, GameObject> elements;
     public UIEvents selectors;
     public FadeController fade;
 
@@ -24,7 +25,7 @@ public class Menu : MonoBehaviour
     public bool isLoadRunning;
     #endregion
 
-    public void Start() //Used to load resolutions and create list for the dropdown, collects both Width and Height seperately
+    public void Awake() //Used to load resolutions and create list for the dropdown, collects both Width and Height seperately
     {
         GetReferences();
         StartCoroutine("LoadScreen");
@@ -34,6 +35,13 @@ public class Menu : MonoBehaviour
     {
         gameManager = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
         fade = GameObject.FindWithTag("FadeController").GetComponent<FadeController>();
+        elements = new Dictionary<string, GameObject>
+        {
+            { "Main", GameObject.Find("Elements_Main") },
+            { "SaveLoad", GameObject.Find("Elements_SaveSelection") },
+        };
+
+        elements["SaveLoad"].SetActive(false);
     }
 
     public void Update()
@@ -56,6 +64,21 @@ public class Menu : MonoBehaviour
         }
     }
 
+    public void SaveSelection(bool toggle)
+    {
+        switch (toggle)
+        {
+            case true:
+                elements["SaveLoad"].SetActive(true);
+                elements["Main"].SetActive(false);
+                break;
+            case false:
+                elements["Main"].SetActive(true);
+                elements["SaveLoad"].SetActive(false);
+                break;
+        }
+    }
+
     public void CallStart() //Trigger for Play Button
     {
         StartCoroutine(StartGame());
@@ -65,10 +88,9 @@ public class Menu : MonoBehaviour
     {
         music.Stop();
         fade.FadeOut();
-        selectors.Visibility(false);
         yield return new WaitForSeconds(2);
-        gameManager.LoadGame();
         fade.FadeIn();
+        gameManager.LoadGame();
     }
 
     public void CallQuit() //Trigger for Exit Button

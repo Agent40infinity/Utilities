@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class UIEvents : MonoBehaviour
 {
     public GameObject previousSelected;
     public List<RectTransform> selectors = new List<RectTransform>();
     public float offset;
+    public RectTransform parent;
 
     public void Start()
     {
@@ -30,7 +32,9 @@ public class UIEvents : MonoBehaviour
                 if (selected != previousSelected)
                 {
                     RectTransform rect = selected.GetComponentInChildren<RectTransform>();
-                    float rectPosition = rect.rect.width / 2 + offset;
+                    float scale = parent.localScale.x;
+
+                    float rectPosition = (rect.rect.width / 2 + offset) * scale;
 
                     Visibility(true);
 

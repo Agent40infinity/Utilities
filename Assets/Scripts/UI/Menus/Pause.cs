@@ -9,18 +9,24 @@ public class Pause : MonoBehaviour
     #region Variables
     public PauseState pauseState = PauseState.Playing; //Checks whether or not the game is paused
     public OptionState optionState = OptionState.Option;
-    public GameObject pauseMenu;
-    public GameObject options, main, mainBackground, background; //Creates reference for the pause menu
+    public GameObject pauseMenu, background;
     public Settings optionsMenu;
-    public Menu menu;
     public FadeController fade;
-    public GameObject gameEvent;
     public UIEvents selectors;
 
     public GameManager gameManager;
     #endregion
 
     #region General
+    public void Awake()
+    {
+        gameManager = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
+        fade = GameObject.FindWithTag("FadeController").GetComponent<FadeController>();
+        pauseMenu.SetActive(false);
+        background.SetActive(false);
+        selectors.Visibility(false);
+    }
+
     public void Update() //Ensures the pause menu can function
     {
         if (Input.GetKeyDown(GameManager.keybind["Pause"])) //Show pause menu
@@ -54,11 +60,10 @@ public class Pause : MonoBehaviour
         switch (optionState)
         {
             case OptionState.Option:
-                OptionsCall(false);
+                //OptionsCall(false);
                 break;
         }
 
-        CheckEvent(pause);
         pauseMenu.SetActive(pause);
         background.SetActive(pause);
 
@@ -69,6 +74,7 @@ public class Pause : MonoBehaviour
                 Time.timeScale = 0f;
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
+                selectors.Visibility(true);
                 break;
             case false:
                 pauseState = PauseState.Playing;
@@ -80,29 +86,7 @@ public class Pause : MonoBehaviour
         }
     }
 
-    public void CheckEvent(bool pause)
-    {
-        switch (pause)
-        {
-            case true:
-                if (GameObject.FindWithTag("GameEvent"))
-                {
-                    gameEvent = GameObject.FindWithTag("GameEvent");
-                    gameEvent.SetActive(false);
-                }
-                break;
-            case false:
-                if (gameEvent != null)
-                {
-                    gameEvent.SetActive(true);
-                    gameEvent = null;
-                }
-                break;
-        }
-
-    }
-
-    public void Menu() //Trigger for menu button
+    public void CallMenu() //Trigger for menu button
     {
         StartCoroutine("ChangeToMain");
     }
@@ -112,15 +96,8 @@ public class Pause : MonoBehaviour
         Time.timeScale = 1f;
         fade.FadeOut();
         yield return new WaitForSeconds(2);
-        pauseState = PauseState.Playing;
-        pauseMenu.SetActive(false);
-        main.SetActive(true);
-        mainBackground.SetActive(true);
-        background.SetActive(false);
-        selectors.Visibility(false);
-
         fade.FadeIn();
-        menu.music.Play();
+        gameManager.QuitGame();
     }
 
     public void OptionsCall(bool toggle)

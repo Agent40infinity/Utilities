@@ -11,6 +11,8 @@ TagManager:
   - UI
   - GameManager
   - FadeController
+  - DeleteSave
+  - SaveIcon
   layers:
   - Default
   - TransparentFX

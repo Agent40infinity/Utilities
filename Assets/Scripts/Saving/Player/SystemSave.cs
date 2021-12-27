@@ -14,7 +14,7 @@ public static class SystemSave
     public static void SavePlayer(Player player, string fileName) //Creates reference to player and allows the player to save their data to a save file.
     {
         BinaryFormatter formatter = new BinaryFormatter(); //Creates a new BinaryFormatter to allow for data conversion.
-        string path = Application.persistentDataPath + "/save" + fileName + ".dat";
+        string path = Application.persistentDataPath + "/" + fileName + ".dat";
         FileStream stream = new FileStream(path, FileMode.Create);
         Debug.Log("path: " + path);
         PlayerData data = new PlayerData(player); //Creates reference to the PlayerData and allows it to be called upon.
@@ -27,7 +27,7 @@ public static class SystemSave
 
     public static PlayerData LoadPlayer(Player player, string fileName) //Allows the player to load their data from the system.
     {
-        string path = Application.persistentDataPath + "/save" + fileName + ".dat"; //Creates a check for the directory of the file.
+        string path = Application.persistentDataPath + "/" + fileName + ".dat"; //Creates a check for the directory of the file.
         if (File.Exists(path)) //Checks if the path and file exist.
         {
             BinaryFormatter formatter = new BinaryFormatter(); //Creates a new reference to the Binary Formatter.
@@ -49,14 +49,14 @@ public static class SystemSave
 
     public static void DeletePlayer(string fileName) //Deletes the selected save file.
     {
-        File.Delete(Application.persistentDataPath + "/save" + fileName + ".dat");
-        Debug.Log("Save" + fileName + " Deleted!");
+        File.Delete(Application.persistentDataPath + "/" + fileName + ".dat");
+        Debug.Log(fileName + " Deleted!");
         return;
     }
 
     private static void SaveDisplay()
     {
-        Animator save = GameObject.Find("Saving").GetComponent<Animator>();
+        Animator save = GameManager.saveIcon;
         save.SetTrigger("SaveLoad");
     }
 }
