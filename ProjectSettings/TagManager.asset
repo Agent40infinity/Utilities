@@ -13,6 +13,7 @@ TagManager:
   - FadeController
   - DeleteSave
   - SaveIcon
+  - Loading
   layers:
   - Default
   - TransparentFX

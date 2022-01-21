@@ -764,7 +764,6 @@ MonoBehaviour:
   selectors: {fileID: 718877728284430041}
   fade: {fileID: 0}
   music: {fileID: 1079323576}
-  optionsMenu: {fileID: 0}
   gameManager: {fileID: 0}
   loadParent: {fileID: 3449545412571064085}
   logo: {fileID: 9116573407660611416}
@@ -1070,19 +1069,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_MethodName: Quit
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 0}
-        m_MethodName: Play
+      - m_Target: {fileID: 4082147358917524836}
+        m_MethodName: CallQuit
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1192,20 +1180,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 4082147358917524836}
         m_MethodName: OptionsCall
         m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-      - m_Target: {fileID: 0}
-        m_MethodName: Play
-        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3808,7 +3785,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 25}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 250, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &6065313561919246242
@@ -3830,11 +3807,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Warning: This game is not suitable for children or those who are easily
-    disturbed.
-
-
-    Contains strong horror themes.'
+  m_text: 'Warning: This game may contain flashing lights that are unsuitable for
+    people with photosensitive epilepsy or other photosensitive conditions.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 11c9035d5035fa34fb9c10353e1e04b5, type: 2}
   m_sharedMaterial: {fileID: -6209227042494116347, guid: 11c9035d5035fa34fb9c10353e1e04b5,

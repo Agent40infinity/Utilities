@@ -15,7 +15,6 @@ public class Menu : MonoBehaviour
 
     //Music:
     public AudioSource music;
-    public Settings optionsMenu;
 
     public GameManager gameManager;
 
@@ -28,7 +27,16 @@ public class Menu : MonoBehaviour
     public void Awake() //Used to load resolutions and create list for the dropdown, collects both Width and Height seperately
     {
         GetReferences();
-        StartCoroutine("LoadScreen");
+
+        switch (GameManager.introPlayed)
+        {
+            case true:
+                StartCoroutine(SkipIntro(GameManager.introPlayed));
+                break;
+            case false:
+                StartCoroutine("IntroScreen");
+                break;
+        }
     }
 
     public void GetReferences()
@@ -51,14 +59,7 @@ public class Menu : MonoBehaviour
             case true:
                 if (Input.GetKeyDown(GameManager.keybind["Pause"]))
                 {
-                    StopCoroutine("LoadScreen");
-                    logo.SetActive(false);
-                    warning.SetActive(false);
-                    loadParent.SetActive(false);
-                    fade.FadeOut();
-                    fade.FadeIn();
-                    music.Play();
-                    isLoadRunning = false;
+                    StartCoroutine(SkipIntro(GameManager.introPlayed));
                 }
                 break;
         }
@@ -87,9 +88,7 @@ public class Menu : MonoBehaviour
     IEnumerator StartGame()
     {
         music.Stop();
-        fade.FadeOut();
-        yield return new WaitForSeconds(2);
-        fade.FadeIn();
+        yield return fade.FadeOut();
         gameManager.LoadGame();
     }
 
@@ -100,36 +99,55 @@ public class Menu : MonoBehaviour
 
     IEnumerator QuitGame()
     {
-        fade.FadeOut();
-        yield return new WaitForSeconds(2);
+        yield return fade.FadeOut();
         Application.Quit();
     }
 
     public void OptionsCall(bool toggle)
     {
-        optionsMenu.ToggleOptions(toggle, LastMenuState.MainMenu);
+        GameManager.optionsMenu.ToggleOptions(toggle);
     }
 
-    IEnumerator LoadScreen() //Called upon to show that the player has died; Makes the player un-hittable and dead.
+    IEnumerator IntroScreen() //Called upon to show that the player has died; Makes the player un-hittable and dead.
     {
         isLoadRunning = true;
-        fade.FadeOut();
-        yield return new WaitForSeconds(1);
+        yield return fade.FadeOut();
         logo.SetActive(true);
         fade.FadeIn();
         yield return new WaitForSeconds(3.5f);
         fade.FadeOut();
-        yield return new WaitForSeconds(1);
+        yield return fade.FadeOut();
         logo.SetActive(false);
         warning.SetActive(true);
         fade.FadeIn();
         yield return new WaitForSeconds(5);
         fade.FadeOut();
-        yield return new WaitForSeconds(1);
+        yield return fade.FadeOut();
         warning.SetActive(false);
         loadParent.SetActive(false);
         fade.FadeIn();
         music.Play();
+        GameManager.introPlayed = true;
         isLoadRunning = false;
+    }
+
+    IEnumerator SkipIntro(bool played)
+    {
+        switch (played)
+        {
+            case false:
+                StopCoroutine("IntroScreen");
+                isLoadRunning = false;
+                GameManager.introPlayed = true;
+
+                yield return fade.FadeOut();
+                fade.FadeIn();
+                break;
+        }
+
+        logo.SetActive(false);
+        warning.SetActive(false);
+        loadParent.SetActive(false);
+        music.Play();
     }
 }

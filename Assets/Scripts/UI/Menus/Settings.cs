@@ -8,32 +8,32 @@ using TMPro;
 
 public class Settings : MonoBehaviour
 {
-    public GameObject mainMenu, options, general, video, audioRef, controls;
+    public GameObject options, background;
     public AudioMixer masterMixer;
     public UIEvents selectors;
 
     Resolution[] resolutions; //Creates reference for all resolutions within Unity
-    public Dropdown resolutionDropdown; //Creates reference for the resolution dropdown 
+    public TMP_Dropdown resolutionDropdown; //Creates reference for the resolution dropdown 
 
     //public Text up, down, left, right, jump, attack, dash;
-    public TextMeshProUGUI moveLeft, moveRight, moveUp, moveDown, shootLeft, shootRight, shootUp, shootDown, attack, heal, trueSight, interact, switchWeapon, pause;
+    public TextMeshProUGUI moveLeft, moveRight, lookUp, lookDown, jump, dash, attack, heal, interact, pause;
     private GameObject currentKey;
 
-    public LastMenuState lastMenuState;
-    public GameObject pauseMenu;
+    public List<GameObject> sectionContent;
 
-    public void Start()
-    { 
+    public void Awake()
+    {
+        GameManager.optionsMenu = this;
 
         resolutions = Screen.resolutions;
         resolutionDropdown.ClearOptions();
 
         int currentResolutionIndex = 0;
-        List<string> options = new List<string>();
-        for (int i = 0; i < resolutions.Length; i++) //Load possible resolutions into list
+        List<string> res = new List<string>();
+        for (int i = 0; i > resolutions.Length; i++) //Load possible resolutions into list
         {
             string option = resolutions[i].width + " x " + resolutions[i].height;
-            options.Add(option);
+            res.Add(option);
 
             if (resolutions[i].width == Screen.currentResolution.width && resolutions[i].height == Screen.currentResolution.height) //Makes sure the resolution is correctly applied
             {
@@ -43,128 +43,71 @@ public class Settings : MonoBehaviour
 
         SetKeybinds();
 
-        resolutionDropdown.AddOptions(options);
+        resolutionDropdown.AddOptions(res);
         resolutionDropdown.value = currentResolutionIndex;
         resolutionDropdown.RefreshShownValue();
+
+        options.SetActive(false);
+        background.SetActive(false);
+        selectors.Visibility(false);
+    }
+
+    public void Update()
+    {
+        if (Event.current != null)
+        {
+            Debug.Log(Event.current);
+        }
     }
 
     public void SetKeybinds()
     {
-        moveLeft.text = CheckSpecial(GameManager.keybind["MoveLeft"]);
-        moveRight.text = CheckSpecial(GameManager.keybind["MoveRight"]);
-        moveUp.text = CheckSpecial(GameManager.keybind["MoveUp"]);
-        moveDown.text = CheckSpecial(GameManager.keybind["MoveDown"]);
-        shootLeft.text = CheckSpecial(GameManager.keybind["ShootLeft"]);
-        shootRight.text = CheckSpecial(GameManager.keybind["ShootRight"]);
-        shootUp.text = CheckSpecial(GameManager.keybind["ShootUp"]);
-        shootDown.text = CheckSpecial(GameManager.keybind["ShootDown"]);
-        attack.text = CheckSpecial(GameManager.keybind["Melee"]);
-        heal.text = CheckSpecial(GameManager.keybind["Heal"]);
-        trueSight.text = CheckSpecial(GameManager.keybind["TrueSight"]);
-        interact.text = CheckSpecial(GameManager.keybind["Interact"]);
-        switchWeapon.text = CheckSpecial(GameManager.keybind["SwitchWeapon"]);
-        pause.text = CheckSpecial(GameManager.keybind["Pause"]);
-    }
-
-    public static string CheckSpecial(KeyCode keybind)
-    {
-        if (keybind == KeyCode.LeftArrow)
-        {
-            return "←";
-        }
-        else if (keybind == KeyCode.RightArrow)
-        {
-            return "→";
-        }
-        else if (keybind == KeyCode.UpArrow)
-        {
-            return "↑";
-        }
-        else if (keybind == KeyCode.DownArrow)
-        {
-            return "↓";
-        }
-        else if (keybind == KeyCode.LeftShift)
-        {
-            return "LS";
-        }
-        else if (keybind == KeyCode.RightShift)
-        {
-            return "RS";
-        }
-        else if (keybind == KeyCode.Escape)
-        {
-            return "Esc";
-        }
-        else
-        {
-            return keybind.ToString();
-        }
-
+        moveLeft.text = KeycodeAlias.CheckSpecial(GameManager.keybind["MoveLeft"]);
+        moveRight.text = KeycodeAlias.CheckSpecial(GameManager.keybind["MoveRight"]);
+        lookUp.text = KeycodeAlias.CheckSpecial(GameManager.keybind["LookUp"]);
+        lookDown.text = KeycodeAlias.CheckSpecial(GameManager.keybind["LookDown"]);
+        jump.text = KeycodeAlias.CheckSpecial(GameManager.keybind["Jump"]);
+        dash.text = KeycodeAlias.CheckSpecial(GameManager.keybind["Dash"]);
+        attack.text = KeycodeAlias.CheckSpecial(GameManager.keybind["Attack"]);
+        heal.text = KeycodeAlias.CheckSpecial(GameManager.keybind["Heal"]);
+        interact.text = KeycodeAlias.CheckSpecial(GameManager.keybind["Interact"]);
+        pause.text = KeycodeAlias.CheckSpecial(GameManager.keybind["Pause"]);
     }
 
     public void OptionsCall(bool toggle)
     {
-        ToggleOptions(toggle, lastMenuState);
+        ToggleOptions(toggle);
     }
 
-    public void ToggleOptions(bool toggle, LastMenuState lastState) //Trigger for Settings - sets active layer/pannel
+    public void ToggleOptions(bool toggle) //Trigger for Settings - sets active layer/pannel
     {
-        lastMenuState = lastState;
-
         if (toggle == true)
         {
-            mainMenu.SetActive(false);
-            pauseMenu.SetActive(false);
             options.SetActive(true);
+            background.SetActive(true);
         }
         else
         {
-            switch (lastMenuState)
-            {
-                case LastMenuState.MainMenu:
-                    mainMenu.SetActive(true);
-                    break;
-                case LastMenuState.PauseMenu:
-                    pauseMenu.SetActive(true); 
-                    break;
-            }
             options.SetActive(false);
+            background.SetActive(false);
         }
 
         selectors.Visibility(false);
     }
 
-    public void ChangeBetween(int option) //Trigger for Settings - sets active layer/pannel
+    public void ChangeBetween(Transform button) //Trigger for Settings - sets active layer/pannel
     {
-        switch (option)
+        int index = button.transform.GetSiblingIndex();
+        for (int i = 0; i < sectionContent.Count; i++)
         {
-            case 0:
-                general.SetActive(true);
-                video.SetActive(false);
-                audioRef.SetActive(false);
-                controls.SetActive(false);
-
-                SystemConfig.SaveSettings();
-                break;
-            case 1:
-                general.SetActive(false);
-                video.SetActive(true);
-                audioRef.SetActive(false);
-                controls.SetActive(false);
-                break;
-            case 2:
-                general.SetActive(false);
-                video.SetActive(false);
-                audioRef.SetActive(true);
-                controls.SetActive(false);
-                break;
-            case 3:
-                general.SetActive(false);
-                video.SetActive(false);
-                audioRef.SetActive(false);
-                controls.SetActive(true);
-                break;
+            if (i == index)
+            {
+                sectionContent[i].SetActive(true);
+            }
+            else
+            {
+                sectionContent[i].SetActive(false);
+            }
         }
 
         selectors.Visibility(false);
@@ -221,15 +164,17 @@ public class Settings : MonoBehaviour
             if (keypress.shift)
             {
                 GameManager.keybind[currentKey.name] = KeyCode.LeftShift;
-                currentKey.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = CheckSpecial(keypress.keyCode);
-                currentKey = null; 
+
+                currentKey.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = KeycodeAlias.CheckSpecial(keypress.keyCode); //Changes the text to match that of the keycode replacing the previous one
+                currentKey = null; //resets the currentKey putting it back to null
             }
             else if (keypress.isKey) //Checks whether or not the event "keypress" contains a keycode
             {
                 GameManager.keybind[currentKey.name] = keypress.keyCode; //Saves the keycode from the event as the keycode attached to the keybind dictionary
-                currentKey.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = CheckSpecial(keypress.keyCode); //Changes the text to match that of the keycode replacing the previous one
+
+                currentKey.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = KeycodeAlias.CheckSpecial(keypress.keyCode); //Changes the text to match that of the keycode replacing the previous one
                 currentKey = null; //resets the currentKey putting it back to null
-            }            
+            }
         }
     }
 
@@ -237,10 +182,4 @@ public class Settings : MonoBehaviour
     {
         currentKey = clicked;
     }
-}
-
-public enum LastMenuState
-{
-    MainMenu,
-    PauseMenu
 }

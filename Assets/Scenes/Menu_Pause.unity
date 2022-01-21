@@ -1476,7 +1476,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_TargetDisplay: 0
 --- !u!224 &1899487536
 RectTransform:
@@ -1513,10 +1513,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pauseState: 0
-  optionState: 1
   pauseMenu: {fileID: 1479347880}
   background: {fileID: 942843872}
-  optionsMenu: {fileID: 0}
   fade: {fileID: 0}
   selectors: {fileID: 1721727145}
   gameManager: {fileID: 0}

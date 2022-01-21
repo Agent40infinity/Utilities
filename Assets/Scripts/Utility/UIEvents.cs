@@ -49,9 +49,14 @@ public class UIEvents : MonoBehaviour
 
     public void Visibility(bool active)
     {
-        for (int i = 0; i < selectors.Count; i++)
+        switch (EventSystem.current.currentSelectedGameObject != null)
         {
-            selectors[i].gameObject.SetActive(active);
+            case true:
+                for (int i = 0; i < selectors.Count; i++)
+                {
+                    selectors[i].gameObject.SetActive(active);
+                }
+                break;
         }
     }
 }

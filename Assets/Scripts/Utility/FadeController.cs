@@ -5,15 +5,43 @@ using UnityEngine.SceneManagement;
 
 public class FadeController : MonoBehaviour
 {
-    public Animator Fade; //Creates a reference for the Animator: Fade.
+    public Animator fade; //Creates a reference for the Animator: Fade.
+    public FadeState fadeState;
 
-    public void FadeOut() //Called upon to Fade Out.
+    public IEnumerator FadeOut() //Called upon to Fade Out.
     {
-        Fade.SetTrigger("FadeOut");
+        fade.SetTrigger("FadeOut");
+        yield return FadeWait();
     }
 
     public void FadeIn() //Called upon to Fade In.
     {
-        Fade.SetTrigger("FadeIn");
+        fade.SetTrigger("FadeIn");
     }
+
+    public IEnumerator FadeWait()
+    {
+        while (!FinishedFade())
+        {
+            yield return null;
+        }
+    }
+
+    public bool FinishedFade()
+    {
+        switch (fadeState)
+        {
+            case FadeState.Ended:
+                fadeState = FadeState.Idle;
+                return true;
+            default:
+                return false;
+        }
+    }
+}
+
+public enum FadeState
+{
+    Idle,
+    Ended
 }

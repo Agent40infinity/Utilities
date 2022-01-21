@@ -230,7 +230,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb2429dd408c5e64f96da43f94f9a442, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loadingScreen: {fileID: 1959816732}
+  loadingScreen: {fileID: 1959816737}
+  fade: {fileID: 1769037665}
 --- !u!1 &841384471
 GameObject:
   m_ObjectHideFlags: 0
@@ -594,7 +595,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 931f7123efde20a4bb8470e9f341d682, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Fade: {fileID: 3234445333147487385}
+  fade: {fileID: 3234445333147487385}
+  fadeState: 0
 --- !u!1 &1878770898
 GameObject:
   m_ObjectHideFlags: 0
@@ -687,12 +689,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1959816736}
+  - component: {fileID: 1959816737}
   - component: {fileID: 1959816735}
   - component: {fileID: 1959816734}
   - component: {fileID: 1959816733}
   m_Layer: 5
   m_Name: LoadingScreen
-  m_TagString: Untagged
+  m_TagString: Loading
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -755,7 +758,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 4
   m_TargetDisplay: 0
 --- !u!224 &1959816736
 RectTransform:
@@ -778,6 +781,19 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1959816737
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1959816732}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdcf743fdfa5ccd40a5b90d78f6a1fc6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fade: {fileID: 1769037665}
 --- !u!222 &384132118660519138
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -800,7 +816,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 0, g: 0, b: 0, a: 0}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -863,6 +879,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3536194799646600311}
   - component: {fileID: 384132118660519138}
+  - component: {fileID: 4826886690981979842}
   - component: {fileID: 3227205006653571943}
   - component: {fileID: 3234445333147487385}
   m_Layer: 5
@@ -872,6 +889,19 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &4826886690981979842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4826886690981979841}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cab33f4ff1cb354f92ea13d613087db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controller: {fileID: 1769037665}
 --- !u!1 &5451870263101919233
 GameObject:
   m_ObjectHideFlags: 0

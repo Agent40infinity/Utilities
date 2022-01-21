@@ -9,30 +9,27 @@ public class GameManager : MonoBehaviour
 {
     [Header("Manager")]
     public static GameManager instance;
-    public GameObject loadingScreen;
+    public LoadingScreen loadingScreen;
     public static string loadedSaveFile;
     public static Animator saveIcon;
     public static Player player;
+    public static bool introPlayed;
+    public static Settings optionsMenu;
+    public FadeController fade;
 
     [Header("Settings")]
     public static AudioMixer masterMixer; //Creates reference for the menu musi
     public static Dictionary<string, KeyCode> keybind = new Dictionary<string, KeyCode> //Dictionary to store the keybinds.
     {
-        { "MoveUp", KeyCode.W },
-        { "MoveDown", KeyCode.S },
+        { "LookUp", KeyCode.W },
+        { "LookDown", KeyCode.S },
         { "MoveLeft", KeyCode.A },
         { "MoveRight", KeyCode.D },
-        { "ShootUp", KeyCode.UpArrow },
-        { "ShootDown", KeyCode.DownArrow },
-        { "ShootLeft", KeyCode.LeftArrow },
-        { "ShootRight", KeyCode.RightArrow },
-        { "Melee", KeyCode.E },
+        { "Jump", KeyCode.Space },
+        { "Dash", KeyCode.LeftShift },
+        { "Attack", KeyCode.E },
         { "Heal", KeyCode.R },
-        { "Parry", KeyCode.LeftShift },
-        { "TrueSight", KeyCode.X },
         { "Interact", KeyCode.F },
-        { "SwitchWeapon", KeyCode.Tab },
-        { "Inventory", KeyCode.I },
         { "Pause", KeyCode.Escape }
     };
 
@@ -47,6 +44,7 @@ public class GameManager : MonoBehaviour
         instance = this;
         saveIcon = GameObject.FindWithTag("SaveIcon").GetComponent<Animator>();
 
+        SceneManager.LoadSceneAsync((int)SceneIndex.Menu_Options, LoadSceneMode.Additive);
         SceneManager.LoadSceneAsync((int)SceneIndex.Menu_Main, LoadSceneMode.Additive);
     }
 
@@ -66,7 +64,7 @@ public class GameManager : MonoBehaviour
 
     public void LoadGame()
     {
-        loadingScreen.SetActive(true);
+        loadingScreen.Visibility(true);
 
         List<AsyncOperation> scenesLoading = new List<AsyncOperation>();
         scenesLoading.Add(SceneManager.UnloadSceneAsync((int)SceneIndex.Menu_Main));
@@ -80,26 +78,26 @@ public class GameManager : MonoBehaviour
 
     public void QuitGame()
     {
-        loadingScreen.SetActive(true);
+        loadingScreen.Visibility(true);
 
         List<AsyncOperation> scenesLoading = new List<AsyncOperation>();
-        scenesLoading.Add(SceneManager.LoadSceneAsync((int)SceneIndex.Menu_Main, LoadSceneMode.Additive));
         for (int i = 0; i < SceneManager.sceneCount; i++)
         {
             int buildIndex = SceneManager.GetSceneAt(i).buildIndex;
+            Debug.Log(SceneManager.GetSceneAt(i).name);
 
             switch (buildIndex)
             {
-                case (int)SceneIndex.Persistent:
+                case (int)SceneIndex.Persistent: case (int)SceneIndex.Menu_Options:
                     break;
                 default:
                     scenesLoading.Add(SceneManager.UnloadSceneAsync(buildIndex));
                     break;
             }
         }
-
+        scenesLoading.Add(SceneManager.LoadSceneAsync((int)SceneIndex.Menu_Main, LoadSceneMode.Additive));
         StartCoroutine(SceneLoadProgress(scenesLoading));
-        StartCoroutine(SaveDataProgress());
+        StartCoroutine(SaveQuitProgress());
     }
 
     float totalSceneProgress;
@@ -110,14 +108,14 @@ public class GameManager : MonoBehaviour
         {
             while (!scenesLoading[i].isDone)
             {
-                totalSceneProgress = 0;
+                /*totalSceneProgress = 0;
 
                 foreach (AsyncOperation operation in scenesLoading)
                 {
                     totalSceneProgress += operation.progress;
                 }
 
-                totalSceneProgress = (totalSceneProgress / scenesLoading.Count) * 100f;
+                totalSceneProgress = (totalSceneProgress / scenesLoading.Count) * 100f;*/
 
                 yield return null;
             }
@@ -145,7 +143,21 @@ public class GameManager : MonoBehaviour
 
         yield return new WaitForSeconds(1f);
 
-        loadingScreen.SetActive(false);
+        yield return fade.FadeOut();
+        loadingScreen.Visibility(false);
+    }
+
+    public IEnumerator SaveQuitProgress()
+    {
+        yield return new WaitForSeconds(2f);
+
+        while (player != null)
+        {
+            yield return null;
+        }
+
+        yield return fade.FadeOut();
+        loadingScreen.Visibility(false);
     }
 
     public void OnApplicationQuit()

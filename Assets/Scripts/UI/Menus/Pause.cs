@@ -8,9 +8,7 @@ public class Pause : MonoBehaviour
 {
     #region Variables
     public PauseState pauseState = PauseState.Playing; //Checks whether or not the game is paused
-    public OptionState optionState = OptionState.Option;
     public GameObject pauseMenu, background;
-    public Settings optionsMenu;
     public FadeController fade;
     public UIEvents selectors;
 
@@ -57,13 +55,6 @@ public class Pause : MonoBehaviour
 
     public void UpdatePause(bool pause)
     {
-        switch (optionState)
-        {
-            case OptionState.Option:
-                //OptionsCall(false);
-                break;
-        }
-
         pauseMenu.SetActive(pause);
         background.SetActive(pause);
 
@@ -94,26 +85,13 @@ public class Pause : MonoBehaviour
     IEnumerator ChangeToMain()
     {
         Time.timeScale = 1f;
-        fade.FadeOut();
-        yield return new WaitForSeconds(2);
-        fade.FadeIn();
+        yield return fade.FadeOut();
         gameManager.QuitGame();
     }
 
     public void OptionsCall(bool toggle)
     {
-        switch (toggle)
-        {
-            case true:
-                optionState = OptionState.Option;
-                break;
-            case false:
-                optionState = OptionState.Pause;
-                optionsMenu.ChangeBetween(0);
-                break;
-        }
-
-        optionsMenu.ToggleOptions(toggle, LastMenuState.PauseMenu);
+        GameManager.optionsMenu.ToggleOptions(toggle);
     }
     #endregion
 }
@@ -122,10 +100,4 @@ public enum PauseState
 {
     Playing,
     Pause
-}
-
-public enum OptionState
-{ 
-    Pause,
-    Option
 }
