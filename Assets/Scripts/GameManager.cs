@@ -36,6 +36,10 @@ public class GameManager : MonoBehaviour
     public void Awake()
     {
         StartGame();
+    }
+
+    public void Start()
+    {
         LoadSettings();
     }
 
@@ -43,6 +47,7 @@ public class GameManager : MonoBehaviour
     {
         instance = this;
         saveIcon = GameObject.FindWithTag("SaveIcon").GetComponent<Animator>();
+        masterMixer = Resources.Load("Music/Mixers/Master") as AudioMixer; //Loads the MasterMixer for renference.
 
         SceneManager.LoadSceneAsync((int)SceneIndex.Menu_Options, LoadSceneMode.Additive);
         SceneManager.LoadSceneAsync((int)SceneIndex.Menu_Main, LoadSceneMode.Additive);
@@ -50,8 +55,6 @@ public class GameManager : MonoBehaviour
 
     public void LoadSettings()
     {
-        masterMixer = Resources.Load("Music/Mixers/Master") as AudioMixer; //Loads the MasterMixer for renference.
-
         if (File.Exists(Application.persistentDataPath + "/settings.json")) //Checks if the file already exists and loads the file if it does.
         {
             SystemConfig.LoadSettings();

@@ -12,6 +12,7 @@ public class Menu : MonoBehaviour
     public Dictionary<string, GameObject> elements;
     public UIEvents selectors;
     public FadeController fade;
+    public bool saveFileSelection;
 
     //Music:
     public AudioSource music;
@@ -63,6 +64,16 @@ public class Menu : MonoBehaviour
                 }
                 break;
         }
+
+        switch (saveFileSelection)
+        {
+            case true:
+                if (Input.GetKeyDown(GameManager.keybind["Pause"]))
+                {
+                    SaveSelection(false);
+                }
+                break;
+        }
     }
 
     public void SaveSelection(bool toggle)
@@ -78,6 +89,8 @@ public class Menu : MonoBehaviour
                 elements["SaveLoad"].SetActive(false);
                 break;
         }
+
+        saveFileSelection = toggle;
     }
 
     public void CallStart() //Trigger for Play Button

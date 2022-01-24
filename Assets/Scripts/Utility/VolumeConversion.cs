@@ -9,10 +9,10 @@ public class VolumeConversion : MonoBehaviour
 
     public void Awake()
     {
-        slider = gameObject.GetComponent<Slider>();
+        slider = gameObject.GetComponentInChildren<Slider>();
         float value;
         if (GameManager.masterMixer.GetFloat(gameObject.name, out value)) //If the mixer within MasterMixer exists, saves the value to it's respective variable so json conversion - Repeats 4 times for each Mixer.
-        { 
+        {
             slider.value = Mathf.Pow(10, (value / 20));
         }
     }

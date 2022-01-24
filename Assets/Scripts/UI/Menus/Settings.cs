@@ -8,32 +8,44 @@ using TMPro;
 
 public class Settings : MonoBehaviour
 {
+    public bool optionsActive;
     public GameObject options, background;
     public AudioMixer masterMixer;
     public UIEvents selectors;
 
     Resolution[] resolutions; //Creates reference for all resolutions within Unity
     public TMP_Dropdown resolutionDropdown; //Creates reference for the resolution dropdown 
+    public Vector2 minimumResolution;
 
     //public Text up, down, left, right, jump, attack, dash;
     public TextMeshProUGUI moveLeft, moveRight, lookUp, lookDown, jump, dash, attack, heal, interact, pause;
+    public List<TextMeshProUGUI> audioVisuals = new List<TextMeshProUGUI>();
     private GameObject currentKey;
 
     public List<GameObject> sectionContent;
+
+    public int AudioRound(float volume)
+    {
+        return Mathf.RoundToInt(volume * 100);
+    }
 
     public void Awake()
     {
         GameManager.optionsMenu = this;
 
         resolutions = Screen.resolutions;
+        Debug.Log(resolutions.Length);
         resolutionDropdown.ClearOptions();
 
         int currentResolutionIndex = 0;
         List<string> res = new List<string>();
-        for (int i = 0; i > resolutions.Length; i++) //Load possible resolutions into list
+        for (int i = 0; i < resolutions.Length; i++) //Load possible resolutions into list
         {
-            string option = resolutions[i].width + " x " + resolutions[i].height;
-            res.Add(option);
+            if (resolutions[i].width >= minimumResolution.x && resolutions[i].height >= minimumResolution.y)
+            {
+                string option = resolutions[i].width + " x " + resolutions[i].height;
+                res.Add(option);
+            }
 
             if (resolutions[i].width == Screen.currentResolution.width && resolutions[i].height == Screen.currentResolution.height) //Makes sure the resolution is correctly applied
             {
@@ -54,9 +66,14 @@ public class Settings : MonoBehaviour
 
     public void Update()
     {
-        if (Event.current != null)
+        switch (optionsActive)
         {
-            Debug.Log(Event.current);
+            case true:
+                if (Input.GetKeyDown(GameManager.keybind["Pause"]))
+                {
+                    ToggleOptions(false);
+                }
+                break;
         }
     }
 
@@ -81,17 +98,17 @@ public class Settings : MonoBehaviour
 
     public void ToggleOptions(bool toggle) //Trigger for Settings - sets active layer/pannel
     {
-        if (toggle == true)
+        options.SetActive(toggle);
+        background.SetActive(toggle);
+
+        switch (toggle)
         {
-            options.SetActive(true);
-            background.SetActive(true);
-        }
-        else
-        {
-            options.SetActive(false);
-            background.SetActive(false);
+            case false:
+                SystemConfig.SaveSettings();
+                break;
         }
 
+        optionsActive = toggle;
         selectors.Visibility(false);
     }
 
@@ -116,21 +133,30 @@ public class Settings : MonoBehaviour
     public void MasterVolume(float volume) //Trigger for changing volume of game's master channel
     {
         GameManager.masterMixer.SetFloat("Master", Mathf.Log10(volume) * 20);
-    }
-
-    public void EffectsVolume(float volume) //Trigger for changing volume of game's sfx channel
-    {
-        GameManager.masterMixer.SetFloat("Effects", Mathf.Log10(volume) * 20);
+        UpdateAudioVisual(AudioRound(volume), 0);
     }
 
     public void MusicVolume(float volume) //Trigger for changing volume of game's music channel
     {
         GameManager.masterMixer.SetFloat("Music", Mathf.Log10(volume) * 20);
+        UpdateAudioVisual(AudioRound(volume), 1);
+    }
+
+    public void EffectsVolume(float volume) //Trigger for changing volume of game's sfx channel
+    {
+        GameManager.masterMixer.SetFloat("Effects", Mathf.Log10(volume) * 20);
+        UpdateAudioVisual(AudioRound(volume), 2);
     }
 
     public void AmbienceVolume(float volume) //Trigger for changing volume of game's music channel
     {
         GameManager.masterMixer.SetFloat("Ambience", Mathf.Log10(volume) * 20);
+        UpdateAudioVisual(AudioRound(volume), 3);
+    }
+
+    public void UpdateAudioVisual(float volume, int index)
+    {
+        audioVisuals[index].text = volume.ToString();
     }
 
     public void ToggleFullscreen(int option) //Trigger for applying fullscreen
