@@ -1,25 +1,26 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 
 public class Pause : MonoBehaviour
 {
     #region Variables
+    [Header("General")]
     public PauseState pauseState = PauseState.Playing; //Checks whether or not the game is paused
     public GameObject pauseMenu, background;
     public FadeController fade;
-    public UIEvents selectors;
 
-    public GameManager gameManager;
+    [Header("Selector")]
+    public GameObject pauseFirst;
+    public UIEvents selectors;
     #endregion
 
     #region General
     public void Awake()
     {
-        gameManager = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
         fade = GameObject.FindWithTag("FadeController").GetComponent<FadeController>();
+        selectors = GameObject.FindWithTag("Selectors").GetComponent<UIEvents>();
         pauseMenu.SetActive(false);
         background.SetActive(false);
         selectors.Visibility(false);
@@ -27,7 +28,7 @@ public class Pause : MonoBehaviour
 
     public void Update() //Ensures the pause menu can function
     {
-        if (Input.GetKeyDown(GameManager.keybind["Pause"])) //Show pause menu
+        if (Input.GetKeyDown(InputManager.instance.keybind["Pause"])) //Show pause menu
         {
             switch (pauseState)
             {
@@ -64,17 +65,17 @@ public class Pause : MonoBehaviour
                 pauseState = PauseState.Pause;
                 Time.timeScale = 0f;
                 Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
-                selectors.Visibility(true);
+                EventSystem.current.SetSelectedGameObject(pauseFirst);
                 break;
             case false:
                 pauseState = PauseState.Playing;
                 Time.timeScale = 1f;
                 Cursor.lockState = CursorLockMode.Locked;
-                Cursor.visible = false;
-                selectors.Visibility(false);
                 break;
         }
+
+        Cursor.visible = pause;
+        selectors.Visibility(pause);
     }
 
     public void CallMenu() //Trigger for menu button
@@ -86,12 +87,12 @@ public class Pause : MonoBehaviour
     {
         Time.timeScale = 1f;
         yield return fade.FadeOut();
-        gameManager.QuitGame();
+        GameManager.instance.QuitGame();
     }
 
     public void OptionsCall(bool toggle)
     {
-        GameManager.optionsMenu.ToggleOptions(toggle);
+        GameManager.instance.optionsMenu.ToggleOptions(toggle);
     }
     #endregion
 }

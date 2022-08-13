@@ -1,24 +1,24 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.Audio;
-using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class Menu : MonoBehaviour
 {
     #region Variables
-    //General:             
+    [Header("General")]          
     public Dictionary<string, GameObject> elements;
-    public UIEvents selectors;
     public FadeController fade;
     public bool saveFileSelection;
 
-    //Music:
+    [Header("Audio")]
     public AudioSource music;
 
-    public GameManager gameManager;
+    [Header("Selection")]
+    public GameObject mainFirst;
+    public GameObject saveLoadFirst;
 
+    [Header("Intro")]
     public GameObject loadParent;
     public GameObject logo;
     public GameObject warning;
@@ -29,10 +29,10 @@ public class Menu : MonoBehaviour
     {
         GetReferences();
 
-        switch (GameManager.introPlayed)
+        switch (GameManager.instance.introPlayed)
         {
             case true:
-                StartCoroutine(SkipIntro(GameManager.introPlayed));
+                StartCoroutine(SkipIntro(GameManager.instance.introPlayed));
                 break;
             case false:
                 StartCoroutine("IntroScreen");
@@ -42,7 +42,6 @@ public class Menu : MonoBehaviour
 
     public void GetReferences()
     {
-        gameManager = GameObject.FindWithTag("GameManager").GetComponent<GameManager>();
         fade = GameObject.FindWithTag("FadeController").GetComponent<FadeController>();
         elements = new Dictionary<string, GameObject>
         {
@@ -58,9 +57,9 @@ public class Menu : MonoBehaviour
         switch (isLoadRunning)
         {
             case true:
-                if (Input.GetKeyDown(GameManager.keybind["Pause"]))
+                if (Input.GetKeyDown(InputManager.instance.keybind["Pause"]))
                 {
-                    StartCoroutine(SkipIntro(GameManager.introPlayed));
+                    StartCoroutine(SkipIntro(GameManager.instance.introPlayed));
                 }
                 break;
         }
@@ -68,7 +67,7 @@ public class Menu : MonoBehaviour
         switch (saveFileSelection)
         {
             case true:
-                if (Input.GetKeyDown(GameManager.keybind["Pause"]))
+                if (Input.GetKeyDown(InputManager.instance.keybind["Pause"]))
                 {
                     SaveSelection(false);
                 }
@@ -83,10 +82,12 @@ public class Menu : MonoBehaviour
             case true:
                 elements["SaveLoad"].SetActive(true);
                 elements["Main"].SetActive(false);
+                EventSystem.current.SetSelectedGameObject(saveLoadFirst);
                 break;
             case false:
                 elements["Main"].SetActive(true);
                 elements["SaveLoad"].SetActive(false);
+                EventSystem.current.SetSelectedGameObject(mainFirst);
                 break;
         }
 
@@ -102,7 +103,7 @@ public class Menu : MonoBehaviour
     {
         music.Stop();
         yield return fade.FadeOut();
-        gameManager.LoadGame();
+        GameManager.instance.LoadGame();
     }
 
     public void CallQuit() //Trigger for Exit Button
@@ -118,7 +119,7 @@ public class Menu : MonoBehaviour
 
     public void OptionsCall(bool toggle)
     {
-        GameManager.optionsMenu.ToggleOptions(toggle);
+        GameManager.instance.optionsMenu.ToggleOptions(toggle);
     }
 
     IEnumerator IntroScreen() //Called upon to show that the player has died; Makes the player un-hittable and dead.
@@ -138,9 +139,10 @@ public class Menu : MonoBehaviour
         yield return fade.FadeOut();
         warning.SetActive(false);
         loadParent.SetActive(false);
+        EventSystem.current.SetSelectedGameObject(mainFirst);
         fade.FadeIn();
         music.Play();
-        GameManager.introPlayed = true;
+        GameManager.instance.introPlayed = true;
         isLoadRunning = false;
     }
 
@@ -151,7 +153,7 @@ public class Menu : MonoBehaviour
             case false:
                 StopCoroutine("IntroScreen");
                 isLoadRunning = false;
-                GameManager.introPlayed = true;
+                GameManager.instance.introPlayed = true;
 
                 yield return fade.FadeOut();
                 fade.FadeIn();

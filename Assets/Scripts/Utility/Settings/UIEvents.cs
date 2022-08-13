@@ -28,7 +28,7 @@ public class UIEvents : MonoBehaviour
     {
         switch (selected.tag)
         {
-            case "Button":
+            case "Selectable":
                 if (selected != previousSelected)
                 {
                     RectTransform rect = selected.GetComponentInChildren<RectTransform>();

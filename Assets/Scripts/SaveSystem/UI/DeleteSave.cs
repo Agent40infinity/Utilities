@@ -34,7 +34,7 @@ public class DeleteSave : MonoBehaviour
     {
         string parentSave;
         parentSave = ParentSave();
-        SystemSave.DeletePlayer(parentSave);
+        DataManager.instance.DeletePlayer(parentSave);
         fileCheck(gameObject);
     }
 }

@@ -15,7 +15,7 @@ public class GameSelection : MonoBehaviour
     public void CreateLoad()
     {
         string name = gameObject.name.Replace("Save", "Save_");
-        GameManager.loadedSaveFile = name;
+        GameManager.instance.loadedSaveFile = name;
 
         menu.CallStart();
     }

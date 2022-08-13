@@ -9,18 +9,18 @@ EditorBuildSettings:
     path: Assets/Scenes/Persistent.unity
     guid: 2cda990e2423bbf4892e6590ba056729
   - enabled: 1
-    path: Assets/Scenes/Menu_Main.unity
+    path: Assets/Scenes/Menus/Menu_Main.unity
     guid: b710ecd99745876479da38b80005a296
   - enabled: 1
-    path: Assets/Scenes/Menu_Options.unity
+    path: Assets/Scenes/Menus/Menu_Options.unity
     guid: d5f3a4693aa02e44089be4737971e1f2
   - enabled: 1
-    path: Assets/Scenes/Menu_Pause.unity
+    path: Assets/Scenes/Menus/Menu_Pause.unity
     guid: d837246c06e54874aaff4ed51ccf24e2
   - enabled: 1
     path: Assets/Scenes/Player.unity
     guid: 46dc2d4083757b54fa0ec0fd17e15bcb
   - enabled: 1
-    path: Assets/Scenes/World.unity
+    path: Assets/Scenes/World/World.unity
     guid: d92db2ccb3c0eb44ab1e908ebdc197e6
   m_configObjects: {}

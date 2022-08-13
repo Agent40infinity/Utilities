@@ -7,17 +7,17 @@ public class Player : MonoBehaviour
 {
     public void Awake()
     {
-        GameManager.player = this;
+        GameManager.instance.player = this;
     }
 
     public void OnDestroy()
     {
-        if (File.Exists(Application.persistentDataPath + "/" + GameManager.loadedSaveFile + ".dat"))
+        if (File.Exists(Application.persistentDataPath + "/" + GameManager.instance.loadedSaveFile + ".dat"))
         {
-            SystemSave.SavePlayer(this, GameManager.loadedSaveFile);
-            Debug.Log("Saved Player: " + GameManager.loadedSaveFile);
+            DataManager.instance.SavePlayer(this, GameManager.instance.loadedSaveFile);
+            Debug.Log("Saved Player: " + GameManager.instance.loadedSaveFile);
         }
 
-        GameManager.player = null;
+        GameManager.instance.player = null;
     }
 }

@@ -1,28 +1,32 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.Audio;
-using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using TMPro;
 
 public class Settings : MonoBehaviour
 {
+    [Header("General")]
     public bool optionsActive;
     public GameObject options, background;
-    public AudioMixer masterMixer;
-    public UIEvents selectors;
+    public List<GameObject> sectionContent;
 
-    Resolution[] resolutions; //Creates reference for all resolutions within Unity
+    [Header("Selection")]
+    public GameObject settingsFirst;
+
+    [Header("Resolution")]
     public TMP_Dropdown resolutionDropdown; //Creates reference for the resolution dropdown 
     public Vector2 minimumResolution;
+    Resolution[] resolutions; //Creates reference for all resolutions within Unity
 
-    //public Text up, down, left, right, jump, attack, dash;
+    [Header("Controls")]
     public TextMeshProUGUI moveLeft, moveRight, lookUp, lookDown, jump, dash, attack, heal, interact, pause;
-    public List<TextMeshProUGUI> audioVisuals = new List<TextMeshProUGUI>();
     private GameObject currentKey;
 
-    public List<GameObject> sectionContent;
+    [Header("Audio")]
+    public List<TextMeshProUGUI> audioVisuals = new List<TextMeshProUGUI>();
+    public AudioMixer masterMixer;
 
     public int AudioRound(float volume)
     {
@@ -31,7 +35,7 @@ public class Settings : MonoBehaviour
 
     public void Awake()
     {
-        GameManager.optionsMenu = this;
+        GameManager.instance.optionsMenu = this;
 
         resolutions = Screen.resolutions;
         Debug.Log(resolutions.Length);
@@ -61,7 +65,6 @@ public class Settings : MonoBehaviour
 
         options.SetActive(false);
         background.SetActive(false);
-        selectors.Visibility(false);
     }
 
     public void Update()
@@ -69,7 +72,7 @@ public class Settings : MonoBehaviour
         switch (optionsActive)
         {
             case true:
-                if (Input.GetKeyDown(GameManager.keybind["Pause"]))
+                if (Input.GetKeyDown(InputManager.instance.keybind["Pause"]))
                 {
                     ToggleOptions(false);
                 }
@@ -79,16 +82,16 @@ public class Settings : MonoBehaviour
 
     public void SetKeybinds()
     {
-        moveLeft.text = KeycodeAlias.CheckSpecial(GameManager.keybind["MoveLeft"]);
-        moveRight.text = KeycodeAlias.CheckSpecial(GameManager.keybind["MoveRight"]);
-        lookUp.text = KeycodeAlias.CheckSpecial(GameManager.keybind["LookUp"]);
-        lookDown.text = KeycodeAlias.CheckSpecial(GameManager.keybind["LookDown"]);
-        jump.text = KeycodeAlias.CheckSpecial(GameManager.keybind["Jump"]);
-        dash.text = KeycodeAlias.CheckSpecial(GameManager.keybind["Dash"]);
-        attack.text = KeycodeAlias.CheckSpecial(GameManager.keybind["Attack"]);
-        heal.text = KeycodeAlias.CheckSpecial(GameManager.keybind["Heal"]);
-        interact.text = KeycodeAlias.CheckSpecial(GameManager.keybind["Interact"]);
-        pause.text = KeycodeAlias.CheckSpecial(GameManager.keybind["Pause"]);
+        moveLeft.text = KeycodeAlias.CheckSpecial(InputManager.instance.keybind["MoveLeft"]);
+        moveRight.text = KeycodeAlias.CheckSpecial(InputManager.instance.keybind["MoveRight"]);
+        lookUp.text = KeycodeAlias.CheckSpecial(InputManager.instance.keybind["LookUp"]);
+        lookDown.text = KeycodeAlias.CheckSpecial(InputManager.instance.keybind["LookDown"]);
+        jump.text = KeycodeAlias.CheckSpecial(InputManager.instance.keybind["Jump"]);
+        dash.text = KeycodeAlias.CheckSpecial(InputManager.instance.keybind["Dash"]);
+        attack.text = KeycodeAlias.CheckSpecial(InputManager.instance.keybind["Attack"]);
+        heal.text = KeycodeAlias.CheckSpecial(InputManager.instance.keybind["Heal"]);
+        interact.text = KeycodeAlias.CheckSpecial(InputManager.instance.keybind["Interact"]);
+        pause.text = KeycodeAlias.CheckSpecial(InputManager.instance.keybind["Pause"]);
     }
 
     public void OptionsCall(bool toggle)
@@ -104,12 +107,15 @@ public class Settings : MonoBehaviour
         switch (toggle)
         {
             case false:
-                SystemConfig.SaveSettings();
+                DataManager.instance.SaveSettings();
+                break;
+            case true:
+                EventSystem.current.SetSelectedGameObject(settingsFirst);
                 break;
         }
 
         optionsActive = toggle;
-        selectors.Visibility(false);
+        //selectors.Visibility(false);
     }
 
     public void ChangeBetween(Transform button) //Trigger for Settings - sets active layer/pannel
@@ -127,30 +133,30 @@ public class Settings : MonoBehaviour
             }
         }
 
-        selectors.Visibility(false);
+        //selectors.Visibility(false);
     }
 
     public void MasterVolume(float volume) //Trigger for changing volume of game's master channel
     {
-        GameManager.masterMixer.SetFloat("Master", Mathf.Log10(volume) * 20);
+        GameManager.instance.masterMixer.SetFloat("Master", Mathf.Log10(volume) * 20);
         UpdateAudioVisual(AudioRound(volume), 0);
     }
 
     public void MusicVolume(float volume) //Trigger for changing volume of game's music channel
     {
-        GameManager.masterMixer.SetFloat("Music", Mathf.Log10(volume) * 20);
+        GameManager.instance.masterMixer.SetFloat("Music", Mathf.Log10(volume) * 20);
         UpdateAudioVisual(AudioRound(volume), 1);
     }
 
     public void EffectsVolume(float volume) //Trigger for changing volume of game's sfx channel
     {
-        GameManager.masterMixer.SetFloat("Effects", Mathf.Log10(volume) * 20);
+        GameManager.instance.masterMixer.SetFloat("Effects", Mathf.Log10(volume) * 20);
         UpdateAudioVisual(AudioRound(volume), 2);
     }
 
     public void AmbienceVolume(float volume) //Trigger for changing volume of game's music channel
     {
-        GameManager.masterMixer.SetFloat("Ambience", Mathf.Log10(volume) * 20);
+        GameManager.instance.masterMixer.SetFloat("Ambience", Mathf.Log10(volume) * 20);
         UpdateAudioVisual(AudioRound(volume), 3);
     }
 
@@ -189,14 +195,14 @@ public class Settings : MonoBehaviour
 
             if (keypress.shift)
             {
-                GameManager.keybind[currentKey.name] = KeyCode.LeftShift;
+                InputManager.instance.keybind[currentKey.name] = KeyCode.LeftShift;
 
                 currentKey.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = KeycodeAlias.CheckSpecial(keypress.keyCode); //Changes the text to match that of the keycode replacing the previous one
                 currentKey = null; //resets the currentKey putting it back to null
             }
             else if (keypress.isKey) //Checks whether or not the event "keypress" contains a keycode
             {
-                GameManager.keybind[currentKey.name] = keypress.keyCode; //Saves the keycode from the event as the keycode attached to the keybind dictionary
+                InputManager.instance.keybind[currentKey.name] = keypress.keyCode; //Saves the keycode from the event as the keycode attached to the keybind dictionary
 
                 currentKey.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = KeycodeAlias.CheckSpecial(keypress.keyCode); //Changes the text to match that of the keycode replacing the previous one
                 currentKey = null; //resets the currentKey putting it back to null

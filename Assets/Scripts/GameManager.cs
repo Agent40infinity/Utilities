@@ -4,43 +4,34 @@ using UnityEngine;
 using System.IO;
 using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
+using System.Linq;
+using DevLocker.Utils;
 
 public class GameManager : MonoBehaviour
 {
-    [Header("Manager")]
+    [Header("Instance")]
     public static GameManager instance;
+
+    [Header("General")]
+    public string loadedSaveFile;
+    public Animator saveIcon;
+    public Player player;
+    public bool introPlayed;
+    public Settings optionsMenu;
+
+    [Header("Manager")]
     public LoadingScreen loadingScreen;
-    public static string loadedSaveFile;
-    public static Animator saveIcon;
-    public static Player player;
-    public static bool introPlayed;
-    public static Settings optionsMenu;
     public FadeController fade;
+    public List<SceneReference> exclusionScenes;
+    public List<SceneReference> startingScenes;
+    public List<SceneReference> GameScenes;
 
     [Header("Settings")]
-    public static AudioMixer masterMixer; //Creates reference for the menu musi
-    public static Dictionary<string, KeyCode> keybind = new Dictionary<string, KeyCode> //Dictionary to store the keybinds.
-    {
-        { "LookUp", KeyCode.W },
-        { "LookDown", KeyCode.S },
-        { "MoveLeft", KeyCode.A },
-        { "MoveRight", KeyCode.D },
-        { "Jump", KeyCode.Space },
-        { "Dash", KeyCode.LeftShift },
-        { "Attack", KeyCode.E },
-        { "Heal", KeyCode.R },
-        { "Interact", KeyCode.F },
-        { "Pause", KeyCode.Escape }
-    };
+    public AudioMixer masterMixer; //Creates reference for the menu musi
 
     public void Awake()
     {
         StartGame();
-    }
-
-    public void Start()
-    {
-        LoadSettings();
     }
 
     public void StartGame()
@@ -49,77 +40,52 @@ public class GameManager : MonoBehaviour
         saveIcon = GameObject.FindWithTag("SaveIcon").GetComponent<Animator>();
         masterMixer = Resources.Load("Music/Mixers/Master") as AudioMixer; //Loads the MasterMixer for renference.
 
-        SceneManager.LoadSceneAsync((int)SceneIndex.Menu_Options, LoadSceneMode.Additive);
-        SceneManager.LoadSceneAsync((int)SceneIndex.Menu_Main, LoadSceneMode.Additive);
-    }
-
-    public void LoadSettings()
-    {
-        if (File.Exists(Application.persistentDataPath + "/settings.json")) //Checks if the file already exists and loads the file if it does.
-        {
-            SystemConfig.LoadSettings();
-        }
-        else //Else, creates the data for the new file.
-        {
-            SystemConfig.SaveSettings(); //Saves the new data as a new file "Settings".
-        }
+        SceneHandler.LoadScenes(startingScenes);
     }
 
     public void LoadGame()
     {
         loadingScreen.Visibility(true);
 
-        List<AsyncOperation> scenesLoading = new List<AsyncOperation>();
-        scenesLoading.Add(SceneManager.UnloadSceneAsync((int)SceneIndex.Menu_Main));
-        scenesLoading.Add(SceneManager.LoadSceneAsync((int)SceneIndex.Player, LoadSceneMode.Additive));
-        scenesLoading.Add(SceneManager.LoadSceneAsync((int)SceneIndex.World, LoadSceneMode.Additive));
-        scenesLoading.Add(SceneManager.LoadSceneAsync((int)SceneIndex.Menu_Pause, LoadSceneMode.Additive));
+        List<AsyncOperation> scenesLoading = SceneHandler.LoadScenes(GameScenes);
+        scenesLoading.Add(SceneManager.UnloadSceneAsync("Menu_Main"));
 
-        StartCoroutine(SceneLoadProgress(scenesLoading));
-        StartCoroutine(SaveDataProgress());
+        StartCoroutine(LoadProgression(scenesLoading, true));
     }
 
     public void QuitGame()
     {
         loadingScreen.Visibility(true);
 
-        List<AsyncOperation> scenesLoading = new List<AsyncOperation>();
-        for (int i = 0; i < SceneManager.sceneCount; i++)
-        {
-            int buildIndex = SceneManager.GetSceneAt(i).buildIndex;
-            Debug.Log(SceneManager.GetSceneAt(i).name);
+        List<AsyncOperation> scenesLoading = SceneHandler.SwapScenes(startingScenes, exclusionScenes);
 
-            switch (buildIndex)
-            {
-                case (int)SceneIndex.Persistent: case (int)SceneIndex.Menu_Options:
-                    break;
-                default:
-                    scenesLoading.Add(SceneManager.UnloadSceneAsync(buildIndex));
-                    break;
-            }
-        }
-        scenesLoading.Add(SceneManager.LoadSceneAsync((int)SceneIndex.Menu_Main, LoadSceneMode.Additive));
-        StartCoroutine(SceneLoadProgress(scenesLoading));
-        StartCoroutine(SaveQuitProgress());
+        StartCoroutine(LoadProgression(scenesLoading, false));
     }
 
-    float totalSceneProgress;
+    public IEnumerator LoadProgression(List<AsyncOperation> scenesLoading, bool isLoad)
+    {
+        StartCoroutine(SceneLoadProgress(scenesLoading));
+
+        switch (isLoad)
+        {
+            case true:
+                yield return StartCoroutine(SaveDataProgress());
+                break;
+            case false:
+                yield return StartCoroutine(SaveQuitProgress());
+                break;
+        }
+
+        yield return fade.FadeOut();
+        loadingScreen.Visibility(false);
+    }
 
     public IEnumerator SceneLoadProgress(List<AsyncOperation> scenesLoading)
-    {        
+    {
         for (int i = 0; i < scenesLoading.Count; i++)
         {
             while (!scenesLoading[i].isDone)
             {
-                /*totalSceneProgress = 0;
-
-                foreach (AsyncOperation operation in scenesLoading)
-                {
-                    totalSceneProgress += operation.progress;
-                }
-
-                totalSceneProgress = (totalSceneProgress / scenesLoading.Count) * 100f;*/
-
                 yield return null;
             }
         }
@@ -136,18 +102,15 @@ public class GameManager : MonoBehaviour
 
         if (!File.Exists(Application.persistentDataPath + "/" + loadedSaveFile + ".dat"))
         {
-            SystemSave.SavePlayer(player, loadedSaveFile);
+            DataManager.instance.SavePlayer(player, loadedSaveFile);
             Debug.Log("Created File: " + loadedSaveFile);
         }
         else
         {
-            SystemSave.LoadPlayer(player, loadedSaveFile);
+            DataManager.instance.LoadPlayer(player, loadedSaveFile);
         }
 
         yield return new WaitForSeconds(1f);
-
-        yield return fade.FadeOut();
-        loadingScreen.Visibility(false);
     }
 
     public IEnumerator SaveQuitProgress()
@@ -158,16 +121,13 @@ public class GameManager : MonoBehaviour
         {
             yield return null;
         }
-
-        yield return fade.FadeOut();
-        loadingScreen.Visibility(false);
     }
 
     public void OnApplicationQuit()
     {
         if (loadedSaveFile != null && player != null)
         {
-            SystemSave.SavePlayer(player, loadedSaveFile);
+            DataManager.instance.SavePlayer(player, loadedSaveFile);
         }
     }
 }

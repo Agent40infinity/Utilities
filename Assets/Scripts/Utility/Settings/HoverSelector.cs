@@ -8,5 +8,6 @@ public class HoverSelector : MonoBehaviour, IPointerEnterHandler
     public void OnPointerEnter(PointerEventData eventData)
     {
         EventSystem.current.SetSelectedGameObject(gameObject);
+        gameObject.tag = "Selectable";
     }
 }
